@@ -1,3 +1,4 @@
+using Pitablock.Core;
 using Pitablock.Managers;
 using UnityEngine;
 using UnityEngine.UI;
@@ -16,9 +17,10 @@ namespace Pitablock.UI
         private const float GridWidthRatio = 0.92f;
         private const float GridHeightRatio = 0.95f;
 
-        [SerializeField] private Color fillColor = new(0.78f, 0.88f, 0.98f, 1f);
-        [SerializeField] private Color lineColor = new(0.12f, 0.12f, 0.14f, 1f);
-        [SerializeField] private Color borderColor = new(0.05f, 0.05f, 0.08f, 1f);
+        [SerializeField] private Color fillColorA = PitaBloTheme.GridCellA;
+        [SerializeField] private Color fillColorB = PitaBloTheme.GridCellB;
+        [SerializeField] private Color lineColor = PitaBloTheme.GridLine;
+        [SerializeField] private Color borderColor = PitaBloTheme.GridBorder;
 
         private RectTransform gridRect;
         private RectTransform placedCellsRect;
@@ -121,7 +123,7 @@ namespace Pitablock.UI
             var texture = new Texture2D(texWidth, texHeight, TextureFormat.RGBA32, false);
             texture.filterMode = FilterMode.Point;
 
-            const int borderPx = 6;
+            const int borderPx = 8;
             const int linePx = 2;
 
             for (var y = 0; y < texHeight; y++)
@@ -130,14 +132,19 @@ namespace Pitablock.UI
                 {
                     var onOuterBorder = x < borderPx || y < borderPx
                                         || x >= texWidth - borderPx || y >= texHeight - borderPx;
+                    var cellX = x / pixelsPerCell;
+                    var cellY = y / pixelsPerCell;
                     var localX = x % pixelsPerCell;
                     var localY = y % pixelsPerCell;
                     var onGridLine = localX < linePx || localY < linePx;
+                    var checker = (cellX + cellY) % 2 == 0;
 
                     Color color;
                     if (onOuterBorder)
                     {
-                        color = borderColor;
+                        var borderT = Mathf.Clamp01(
+                            Mathf.Min(x, texWidth - 1 - x, y, texHeight - 1 - y) / (float)borderPx);
+                        color = Color.Lerp(borderColor, Color.Lerp(borderColor, Color.white, 0.25f), borderT);
                     }
                     else if (onGridLine)
                     {
@@ -145,7 +152,7 @@ namespace Pitablock.UI
                     }
                     else
                     {
-                        color = fillColor;
+                        color = checker ? fillColorA : fillColorB;
                     }
 
                     texture.SetPixel(x, y, color);

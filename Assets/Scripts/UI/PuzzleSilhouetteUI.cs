@@ -64,7 +64,7 @@ namespace Pitablock.UI
 
                 var image = go.GetComponent<Image>();
                 image.sprite = sprite;
-                image.color = new Color(0.2f, 0.45f, 0.85f, 0.28f);
+                image.color = PitaBloTheme.Silhouette;
                 image.raycastTarget = false;
                 silhouetteImages.Add(image);
             }

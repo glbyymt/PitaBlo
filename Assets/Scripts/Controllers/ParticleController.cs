@@ -114,7 +114,7 @@ namespace Pitablock.Controllers
             main.startSpeed = 1.2f;
             main.startSize = 0.2f;
             main.maxParticles = 20;
-            main.startColor = new Color(1f, 0.85f, 0.3f, 1f);
+            main.startColor = new Color(1f, 0.55f, 0.85f, 1f);
 
             var emission = ps.emission;
             emission.rateOverTime = 0;

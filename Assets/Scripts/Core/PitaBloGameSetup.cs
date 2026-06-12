@@ -11,14 +11,7 @@ namespace Pitablock.Core
 {
     public class PitaBloGameSetup : MonoBehaviour
     {
-        private static readonly Color BgColor = new(0.68f, 0.84f, 0.97f, 1f);
-        private static readonly Color QuitButtonColor = new(0.77f, 0.65f, 0.45f, 1f);
-        private static readonly Color ChangeButtonColor = new(0.95f, 0.48f, 0.36f, 1f);
-        private static readonly Color UndoButtonColor = new(0.55f, 0.68f, 0.82f, 1f);
-        private static readonly Color TeacherColor = new(1f, 0.62f, 0.32f, 1f);
-
         private Sprite blockSprite;
-        private Sprite buttonSprite;
         private List<BlockData> runtimeBlockData = new();
 
         private void Awake()
@@ -31,8 +24,6 @@ namespace Pitablock.Core
             Screen.autorotateToPortraitUpsideDown = false;
 
             blockSprite = SpriteFactory.CreateRoundedSquareSprite(64, Color.white);
-
-            buttonSprite = SpriteFactory.CreateRoundedSquareSprite(64, new Color(1f, 0.85f, 0.45f));
 
             SetupCamera();
             var managers = SetupManagers();
@@ -52,7 +43,7 @@ namespace Pitablock.Core
             cam.orthographic = true;
             cam.orthographicSize = 5f;
             cam.transform.position = new Vector3(0f, 0f, -10f);
-            cam.backgroundColor = BgColor;
+            cam.backgroundColor = PitaBloTheme.BgColor;
             cam.clearFlags = CameraClearFlags.SolidColor;
         }
 
@@ -94,37 +85,37 @@ namespace Pitablock.Core
             runtimeBlockData = new List<BlockData>
             {
                 // I: 横一列4マス
-                CreateBlock(1, "I", new Color(0.45f, 0.85f, 1f), new Vector2Int[]
+                CreateBlock(1, "I", PitaBloTheme.BlockI, new Vector2Int[]
                 {
                     new(-1, 0), new(0, 0), new(1, 0), new(2, 0)
                 }),
                 // O: 2×2正方形
-                CreateBlock(2, "O", new Color(1f, 0.92f, 0.45f), new Vector2Int[]
+                CreateBlock(2, "O", PitaBloTheme.BlockO, new Vector2Int[]
                 {
                     new(0, 0), new(1, 0), new(0, 1), new(1, 1)
                 }),
                 // T: 上向きT字
-                CreateBlock(3, "T", new Color(0.85f, 0.55f, 1f), new Vector2Int[]
+                CreateBlock(3, "T", PitaBloTheme.BlockT, new Vector2Int[]
                 {
                     new(-1, 0), new(0, 0), new(1, 0), new(0, 1)
                 }),
                 // S: S字
-                CreateBlock(4, "S", new Color(0.55f, 1f, 0.65f), new Vector2Int[]
+                CreateBlock(4, "S", PitaBloTheme.BlockS, new Vector2Int[]
                 {
                     new(-1, 1), new(0, 1), new(0, 0), new(1, 0)
                 }),
                 // Z: Z字
-                CreateBlock(5, "Z", new Color(1f, 0.55f, 0.55f), new Vector2Int[]
+                CreateBlock(5, "Z", PitaBloTheme.BlockZ, new Vector2Int[]
                 {
                     new(-1, 0), new(0, 0), new(0, 1), new(1, 1)
                 }),
                 // J: 左下に1マス
-                CreateBlock(6, "J", new Color(0.55f, 0.65f, 1f), new Vector2Int[]
+                CreateBlock(6, "J", PitaBloTheme.BlockJ, new Vector2Int[]
                 {
                     new(-1, 0), new(0, 0), new(1, 0), new(-1, 1)
                 }),
                 // L: 右下に1マス
-                CreateBlock(7, "L", new Color(1f, 0.75f, 0.45f), new Vector2Int[]
+                CreateBlock(7, "L", PitaBloTheme.BlockL, new Vector2Int[]
                 {
                     new(-1, 0), new(0, 0), new(1, 0), new(1, 1)
                 })
@@ -155,16 +146,19 @@ namespace Pitablock.Core
             scaler.referenceResolution = new Vector2(1080, 1920);
             scaler.matchWidthOrHeight = 0.5f;
 
-            var titlePanel = CreatePanel(canvasGo.transform, "TitlePanel", new Color(0.4f, 0.7f, 1f, 0.35f));
+            var titlePanel = CreatePanel(canvasGo.transform, "TitlePanel", PitaBloTheme.TitlePanel);
+            AddDecorativeBubbles(titlePanel.transform);
             CreateTitleUI(titlePanel);
 
-            var modePanel = CreatePanel(canvasGo.transform, "ModeSelectPanel", new Color(0.5f, 0.85f, 0.75f, 0.35f));
+            var modePanel = CreatePanel(canvasGo.transform, "ModeSelectPanel", PitaBloTheme.ModePanel);
+            AddDecorativeBubbles(modePanel.transform);
             CreateModeSelectUI(modePanel);
 
-            var beginnerSubPanel = CreatePanel(canvasGo.transform, "BeginnerSubPanel", new Color(1f, 0.88f, 0.72f, 0.4f));
+            var beginnerSubPanel = CreatePanel(canvasGo.transform, "BeginnerSubPanel", PitaBloTheme.BeginnerPanel);
+            AddDecorativeBubbles(beginnerSubPanel.transform);
             CreateBeginnerSubSelectUI(beginnerSubPanel);
 
-            var inGamePanel = CreatePanel(canvasGo.transform, "InGamePanel", new Color(BgColor.r, BgColor.g, BgColor.b, 0f));
+            var inGamePanel = CreatePanel(canvasGo.transform, "InGamePanel", new Color(PitaBloTheme.BgColor.r, PitaBloTheme.BgColor.g, PitaBloTheme.BgColor.b, 0f));
             inGamePanel.GetComponent<Image>().raycastTarget = false;
             var gameBoard = inGamePanel.AddComponent<GameBoardUI>();
             gameBoard.Build();
@@ -183,13 +177,14 @@ namespace Pitablock.Core
 
             var inGameUi = CreateInGameUI(inGamePanel);
 
-            var resultPanel = CreatePanel(canvasGo.transform, "ResultPanel", new Color(1f, 0.85f, 0.5f, 0.5f));
+            var resultPanel = CreatePanel(canvasGo.transform, "ResultPanel", PitaBloTheme.ResultPanel);
+            AddDecorativeBubbles(resultPanel.transform);
             var resultMessage = CreateResultUI(resultPanel);
 
-            var collectionPanel = CreatePanel(canvasGo.transform, "CollectionPanel", new Color(0.95f, 0.9f, 1f, 0.6f));
+            var collectionPanel = CreatePanel(canvasGo.transform, "CollectionPanel", PitaBloTheme.CollectionPanel);
             var collectionController = CreateCollectionUI(collectionPanel);
 
-            var reportPanel = CreatePanel(canvasGo.transform, "ReportPanel", new Color(0.9f, 0.9f, 0.95f, 0.85f));
+            var reportPanel = CreatePanel(canvasGo.transform, "ReportPanel", PitaBloTheme.ReportPanel);
             var reportController = CreateReportUI(reportPanel);
 
             UIManager.Instance.BindPanels(titlePanel, modePanel, beginnerSubPanel, inGamePanel, resultPanel, collectionPanel, reportPanel);
@@ -224,36 +219,39 @@ namespace Pitablock.Core
 
         private void CreateTitleUI(GameObject panel)
         {
-            CreateLabel(panel.transform, "ピタブロ！", 120, new Vector2(0f, 350f));
+            var title = CreateLabel(panel.transform, "ピタブロ！", 128, new Vector2(0f, 380f), PitaBloTheme.TitleText, true);
+            ApplyTextOutline(title, PitaBloTheme.TitleOutline, new Vector2(3f, -3f));
 
-            var startBtn = CreateIconButton(panel.transform, "スタート", new Vector2(0f, -100f), new Vector2(320f, 320f), new Color(0.4f, 0.85f, 0.55f));
+            var startBtn = CreateIconButton(panel.transform, "スタート", new Vector2(0f, -80f), new Vector2(340f, 340f), PitaBloTheme.StartButton);
             startBtn.onClick.AddListener(() => UIManager.Instance.OnStartButtonClicked());
 
-            var parentBtn = CreateIconButton(panel.transform, "🔒", new Vector2(420f, 820f), new Vector2(120f, 120f), new Color(0.7f, 0.7f, 0.75f));
+            var parentBtn = CreateIconButton(panel.transform, "🔒", new Vector2(420f, 820f), new Vector2(120f, 120f), PitaBloTheme.BackButton);
             parentBtn.gameObject.AddComponent<ParentGateButton>();
         }
 
         private void CreateModeSelectUI(GameObject panel)
         {
-            CreateLabel(panel.transform, "あそびかた", 80, new Vector2(0f, 700f));
+            var modeTitle = CreateLabel(panel.transform, "あそびかた", 84, new Vector2(0f, 700f), PitaBloTheme.TitleText, true);
+            ApplyTextOutline(modeTitle, PitaBloTheme.TitleOutline, new Vector2(2f, -2f));
 
-            CreateModeButton(panel.transform, "はじめて", 0, new Vector2(0f, 300f), new Color(1f, 0.75f, 0.55f), "はじめての あそび", true);
-            CreateModeButton(panel.transform, "ブロック道", 1, new Vector2(0f, 0f), new Color(0.55f, 0.85f, 1f), "もくひょうを たっせい！", false);
-            CreateModeButton(panel.transform, "おてほん", 2, new Vector2(0f, -300f), new Color(0.75f, 0.9f, 0.55f), "れんしゅう もんだい", false);
+            CreateModeButton(panel.transform, "はじめて", 0, new Vector2(0f, 300f), PitaBloTheme.ModeBeginner, "はじめての あそび", true);
+            CreateModeButton(panel.transform, "ブロック道", 1, new Vector2(0f, 0f), PitaBloTheme.ModeBlockRoad, "もくひょうを たっせい！", false);
+            CreateModeButton(panel.transform, "おてほん", 2, new Vector2(0f, -300f), PitaBloTheme.ModeOtehon, "れんしゅう もんだい", false);
 
-            var collectionBtn = CreateIconButton(panel.transform, "ずかん", new Vector2(-250f, -700f), new Vector2(220f, 220f), new Color(0.95f, 0.8f, 1f));
+            var collectionBtn = CreateIconButton(panel.transform, "ずかん", new Vector2(-250f, -700f), new Vector2(220f, 220f), PitaBloTheme.CollectionTab);
             collectionBtn.onClick.AddListener(() => UIManager.Instance.OnCollectionButtonClicked());
 
-            var backBtn = CreateIconButton(panel.transform, "もどる", new Vector2(250f, -700f), new Vector2(220f, 220f), new Color(0.85f, 0.85f, 0.9f));
+            var backBtn = CreateIconButton(panel.transform, "もどる", new Vector2(250f, -700f), new Vector2(220f, 220f), PitaBloTheme.BackButton);
             backBtn.onClick.AddListener(() => UIManager.Instance.OnBackToTitle());
         }
 
         private void CreateBeginnerSubSelectUI(GameObject panel)
         {
-            CreateLabel(panel.transform, "はじめて あそび", 72, new Vector2(0f, 650f));
-            CreateModeButton(panel.transform, "かたはめ", 0, new Vector2(0f, 150f), new Color(1f, 0.82f, 0.5f), "かたちに おす", false, true);
-            CreateModeButton(panel.transform, "おえかき", 1, new Vector2(0f, -150f), new Color(0.95f, 0.7f, 0.85f), "じゆうに かく", false, true);
-            var back = CreateIconButton(panel.transform, "もどる", new Vector2(0f, -650f), new Vector2(280f, 120f), new Color(0.85f, 0.85f, 0.9f));
+            var subTitle = CreateLabel(panel.transform, "はじめて あそび", 76, new Vector2(0f, 650f), PitaBloTheme.TitleText, true);
+            ApplyTextOutline(subTitle, PitaBloTheme.TitleOutline, new Vector2(2f, -2f));
+            CreateModeButton(panel.transform, "かたはめ", 0, new Vector2(0f, 150f), PitaBloTheme.ModePuzzleFit, "かたちに おす", false, true);
+            CreateModeButton(panel.transform, "おえかき", 1, new Vector2(0f, -150f), PitaBloTheme.ModeFreeDraw, "じゆうに かく", false, true);
+            var back = CreateIconButton(panel.transform, "もどる", new Vector2(0f, -650f), new Vector2(280f, 120f), PitaBloTheme.BackButton);
             back.onClick.AddListener(() => UIManager.Instance.OnBackToModeSelect());
             panel.SetActive(false);
         }
@@ -295,7 +293,8 @@ namespace Pitablock.Core
             subtitleText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
             subtitleText.fontSize = 28;
             subtitleText.alignment = TextAnchor.MiddleCenter;
-            subtitleText.color = new Color(0.2f, 0.2f, 0.25f, 0.9f);
+            subtitleText.color = PitaBloTheme.SubtitleText;
+            subtitleText.fontStyle = FontStyle.Bold;
             subtitleText.text = subtitle;
         }
 
@@ -310,10 +309,10 @@ namespace Pitablock.Core
                 new Vector2(0f, 1f),
                 new Vector2(100f, -100f),
                 new Vector2(200f, 200f),
-                QuitButtonColor,
+                PitaBloTheme.QuitButton,
                 52);
 
-            // 上部中央: どうぶつ先生（オレンジの丸）
+            // 上部中央: どうぶつ先生
             var teacherGo = new GameObject("Teacher", typeof(RectTransform), typeof(Image));
             teacherGo.transform.SetParent(panel.transform, false);
             var teacherRect = teacherGo.GetComponent<RectTransform>();
@@ -323,8 +322,20 @@ namespace Pitablock.Core
             teacherRect.anchoredPosition = new Vector2(0f, -220f);
             teacherRect.sizeDelta = new Vector2(220f, 220f);
             var teacherImage = teacherGo.GetComponent<Image>();
-            teacherImage.sprite = SpriteFactory.CreateCircleSprite(128, TeacherColor);
+            teacherImage.sprite = SpriteFactory.CreateCircleSprite(128, PitaBloTheme.TeacherBody);
             teacherImage.color = Color.white;
+
+            var teacherFaceGo = new GameObject("TeacherFace", typeof(RectTransform), typeof(Text));
+            teacherFaceGo.transform.SetParent(teacherGo.transform, false);
+            var teacherFaceRect = teacherFaceGo.GetComponent<RectTransform>();
+            Stretch(teacherFaceRect);
+            var teacherFace = teacherFaceGo.GetComponent<Text>();
+            teacherFace.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            teacherFace.fontSize = 110;
+            teacherFace.alignment = TextAnchor.MiddleCenter;
+            teacherFace.color = Color.white;
+            teacherFace.text = "🦊";
+            teacherFace.raycastTarget = false;
 
             var praiseGo = new GameObject("PraiseText", typeof(RectTransform), typeof(Text));
             praiseGo.transform.SetParent(panel.transform, false);
@@ -338,10 +349,13 @@ namespace Pitablock.Core
             praiseText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
             praiseText.fontSize = 64;
             praiseText.alignment = TextAnchor.MiddleCenter;
-            praiseText.color = new Color(0.95f, 0.25f, 0.35f, 1f);
+            praiseText.color = PitaBloTheme.PraiseText;
+            praiseText.fontStyle = FontStyle.Bold;
+            ApplyTextOutline(praiseText, PitaBloTheme.TitleOutline, new Vector2(2f, -2f));
             praiseGo.SetActive(false);
 
-            var modeTitleText = CreateAnchoredLabel(panel.transform, "ModeTitle", 44, new Color(0.2f, 0.25f, 0.35f, 1f));
+            var modeTitleText = CreateAnchoredLabel(panel.transform, "ModeTitle", 46, PitaBloTheme.ModeTitleText);
+            modeTitleText.fontStyle = FontStyle.Bold;
             var modeTitleRect = modeTitleText.GetComponent<RectTransform>();
             modeTitleRect.anchorMin = new Vector2(0.5f, 1f);
             modeTitleRect.anchorMax = new Vector2(0.5f, 1f);
@@ -349,7 +363,8 @@ namespace Pitablock.Core
             modeTitleRect.anchoredPosition = new Vector2(0f, -120f);
             modeTitleRect.sizeDelta = new Vector2(700f, 60f);
 
-            var hintText = CreateAnchoredLabel(panel.transform, "ModeHint", 38, new Color(0.15f, 0.35f, 0.55f, 1f));
+            var hintText = CreateAnchoredLabel(panel.transform, "ModeHint", 40, PitaBloTheme.HintText);
+            hintText.fontStyle = FontStyle.Bold;
             var hintRect = hintText.GetComponent<RectTransform>();
             hintRect.anchorMin = new Vector2(0.5f, 0f);
             hintRect.anchorMax = new Vector2(0.5f, 0f);
@@ -357,7 +372,8 @@ namespace Pitablock.Core
             hintRect.anchoredPosition = new Vector2(0f, 360f);
             hintRect.sizeDelta = new Vector2(900f, 56f);
 
-            var goalText = CreateAnchoredLabel(panel.transform, "ModeGoal", 34, new Color(0.85f, 0.35f, 0.2f, 1f));
+            var goalText = CreateAnchoredLabel(panel.transform, "ModeGoal", 36, PitaBloTheme.GoalText);
+            goalText.fontStyle = FontStyle.Bold;
             var goalRect = goalText.GetComponent<RectTransform>();
             goalRect.anchorMin = new Vector2(0.5f, 0f);
             goalRect.anchorMax = new Vector2(0.5f, 0f);
@@ -374,7 +390,7 @@ namespace Pitablock.Core
                 new Vector2(0f, 0f),
                 new Vector2(120f, 120f),
                 new Vector2(200f, 200f),
-                ChangeButtonColor,
+                PitaBloTheme.ChangeButton,
                 64);
             var changeText = changeBtn.GetComponentInChildren<Text>();
 
@@ -387,7 +403,7 @@ namespace Pitablock.Core
                 new Vector2(1f, 0f),
                 new Vector2(-120f, 120f),
                 new Vector2(200f, 200f),
-                UndoButtonColor,
+                PitaBloTheme.UndoButton,
                 48);
 
             // 右端中央: おしえて
@@ -399,7 +415,7 @@ namespace Pitablock.Core
                 new Vector2(1f, 0.5f),
                 new Vector2(-100f, 0f),
                 new Vector2(160f, 160f),
-                new Color(0.95f, 0.85f, 0.35f, 1f),
+                PitaBloTheme.HintButton,
                 72);
 
             panel.SetActive(false);
@@ -421,8 +437,9 @@ namespace Pitablock.Core
 
         private Text CreateResultUI(GameObject panel)
         {
-            var message = CreateLabel(panel.transform, "がんばったね！", 90, new Vector2(0f, 200f));
-            var retry = CreateIconButton(panel.transform, "もういちど", new Vector2(0f, -200f), new Vector2(400f, 200f), new Color(0.55f, 0.9f, 0.65f));
+            var message = CreateLabel(panel.transform, "がんばったね！", 96, new Vector2(0f, 200f), PitaBloTheme.TitleText, true);
+            ApplyTextOutline(message, PitaBloTheme.TitleOutline, new Vector2(2f, -2f));
+            var retry = CreateIconButton(panel.transform, "もういちど", new Vector2(0f, -200f), new Vector2(400f, 200f), PitaBloTheme.RetryButton);
             retry.onClick.AddListener(() => UIManager.Instance.OnResultContinue());
             return message;
         }
@@ -431,9 +448,9 @@ namespace Pitablock.Core
         {
             var controller = panel.AddComponent<CollectionUIController>();
 
-            var animalsTab = CreateIconButton(panel.transform, "どうぶつ", new Vector2(-200f, 750f), new Vector2(280f, 120f), new Color(0.9f, 0.75f, 1f));
-            var sealsTab = CreateIconButton(panel.transform, "シール", new Vector2(200f, 750f), new Vector2(280f, 120f), new Color(1f, 0.85f, 0.65f));
-            var back = CreateIconButton(panel.transform, "もどる", new Vector2(0f, -820f), new Vector2(220f, 120f), new Color(0.85f, 0.85f, 0.9f));
+            var animalsTab = CreateIconButton(panel.transform, "どうぶつ", new Vector2(-200f, 750f), new Vector2(280f, 120f), PitaBloTheme.CollectionTab);
+            var sealsTab = CreateIconButton(panel.transform, "シール", new Vector2(200f, 750f), new Vector2(280f, 120f), PitaBloTheme.SealTab);
+            var back = CreateIconButton(panel.transform, "もどる", new Vector2(0f, -820f), new Vector2(220f, 120f), PitaBloTheme.BackButton);
 
             var animalsContent = CreateScrollArea(panel.transform, "AnimalsContent", new Vector2(0f, -50f));
             var sealsContent = CreateScrollArea(panel.transform, "SealsContent", new Vector2(0f, -50f));
@@ -472,7 +489,7 @@ namespace Pitablock.Core
             sliderRect.sizeDelta = new Vector2(700f, 40f);
             var slider = sliderGo.GetComponent<Slider>();
 
-            var back = CreateIconButton(panel.transform, "とじる", new Vector2(0f, -400f), new Vector2(280f, 120f), new Color(0.8f, 0.8f, 0.85f));
+            var back = CreateIconButton(panel.transform, "とじる", new Vector2(0f, -400f), new Vector2(280f, 120f), PitaBloTheme.BackButton);
             controller.Configure(playTime, cleared, consecutive, slider, back);
             return controller;
         }
@@ -481,9 +498,9 @@ namespace Pitablock.Core
         {
             return new[]
             {
-                CreateAnimal(1, "うさぎ先生", new Color(1f, 0.75f, 0.8f), 0),
-                CreateAnimal(2, "ぞう先生", new Color(0.75f, 0.8f, 1f), 3),
-                CreateAnimal(3, "ねこ先生", new Color(0.9f, 0.85f, 0.6f), 6)
+                CreateAnimal(1, "うさぎ先生", new Color(1f, 0.62f, 0.78f), 0),
+                CreateAnimal(2, "ぞう先生", new Color(0.62f, 0.78f, 1f), 3),
+                CreateAnimal(3, "ねこ先生", new Color(1f, 0.82f, 0.42f), 6)
             };
         }
 
@@ -513,7 +530,7 @@ namespace Pitablock.Core
             data.sealId = id;
             data.sealTitle = title;
             data.description = desc;
-            data.sealSprite = SpriteFactory.CreateRoundedSquareSprite(96, new Color(1f, 0.85f, 0.4f));
+            data.sealSprite = SpriteFactory.CreateGummySprite(96, PitaBloTheme.SealTab);
             return data;
         }
 
@@ -524,7 +541,7 @@ namespace Pitablock.Core
             var scrollRect = scrollGo.GetComponent<RectTransform>();
             scrollRect.anchoredPosition = pos;
             scrollRect.sizeDelta = new Vector2(900f, 1200f);
-            scrollGo.GetComponent<Image>().color = new Color(1f, 1f, 1f, 0.15f);
+            scrollGo.GetComponent<Image>().color = new Color(1f, 0.95f, 1f, 0.25f);
 
             var viewport = new GameObject("Viewport", typeof(RectTransform), typeof(Image), typeof(Mask));
             viewport.transform.SetParent(scrollGo.transform, false);
@@ -579,9 +596,10 @@ namespace Pitablock.Core
             rect.sizeDelta = size;
 
             var image = go.GetComponent<Image>();
-            image.sprite = buttonSprite;
+            image.sprite = SpriteFactory.CreateBubbleButtonSprite(64, color);
             image.type = Image.Type.Sliced;
-            image.color = color;
+            image.color = Color.white;
+            ApplyButtonShadow(image);
 
             var textGo = new GameObject("Text", typeof(RectTransform), typeof(Text));
             textGo.transform.SetParent(go.transform, false);
@@ -590,9 +608,11 @@ namespace Pitablock.Core
             var text = textGo.GetComponent<Text>();
             text.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
             text.fontSize = fontSize;
+            text.fontStyle = FontStyle.Bold;
             text.alignment = TextAnchor.MiddleCenter;
-            text.color = Color.white;
+            text.color = PitaBloTheme.ButtonText;
             text.text = label;
+            ApplyTextOutline(text, PitaBloTheme.ButtonTextOutline, new Vector2(1.5f, -1.5f));
 
             return go.GetComponent<Button>();
         }
@@ -606,9 +626,10 @@ namespace Pitablock.Core
             rect.sizeDelta = size;
 
             var image = go.GetComponent<Image>();
-            image.sprite = buttonSprite;
+            image.sprite = SpriteFactory.CreateBubbleButtonSprite(64, color);
             image.type = Image.Type.Sliced;
-            image.color = color;
+            image.color = Color.white;
+            ApplyButtonShadow(image);
 
             var textGo = new GameObject("Text", typeof(RectTransform), typeof(Text));
             textGo.transform.SetParent(go.transform, false);
@@ -616,15 +637,17 @@ namespace Pitablock.Core
             Stretch(textRect);
             var text = textGo.GetComponent<Text>();
             text.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-            text.fontSize = Mathf.Clamp((int)(size.y * 0.22f), 28, 56);
+            text.fontSize = Mathf.Clamp((int)(size.y * 0.22f), 28, 58);
+            text.fontStyle = FontStyle.Bold;
             text.alignment = TextAnchor.MiddleCenter;
-            text.color = Color.white;
+            text.color = PitaBloTheme.ButtonText;
             text.text = label;
+            ApplyTextOutline(text, PitaBloTheme.ButtonTextOutline, new Vector2(1.5f, -1.5f));
 
             return go.GetComponent<Button>();
         }
 
-        private Text CreateLabel(Transform parent, string text, int fontSize, Vector2 pos)
+        private Text CreateLabel(Transform parent, string text, int fontSize, Vector2 pos, Color? color = null, bool bold = false)
         {
             var go = new GameObject("Label", typeof(RectTransform), typeof(Text));
             go.transform.SetParent(parent, false);
@@ -634,10 +657,51 @@ namespace Pitablock.Core
             var label = go.GetComponent<Text>();
             label.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
             label.fontSize = fontSize;
+            label.fontStyle = bold ? FontStyle.Bold : FontStyle.Normal;
             label.alignment = TextAnchor.MiddleCenter;
-            label.color = new Color(0.2f, 0.25f, 0.35f);
+            label.color = color ?? PitaBloTheme.LabelText;
             label.text = text;
             return label;
+        }
+
+        private static void AddDecorativeBubbles(Transform parent)
+        {
+            var positions = new[]
+            {
+                new Vector2(-380f, 520f), new Vector2(400f, 380f), new Vector2(-320f, -200f),
+                new Vector2(350f, -450f), new Vector2(0f, 600f), new Vector2(-450f, -600f),
+                new Vector2(420f, 700f)
+            };
+            var sizes = new[] { 180f, 140f, 220f, 160f, 120f, 200f, 100f };
+
+            for (var i = 0; i < positions.Length; i++)
+            {
+                var color = PitaBloTheme.BubbleColors[i % PitaBloTheme.BubbleColors.Length];
+                var size = (int)sizes[i % sizes.Length];
+                var bubbleGo = new GameObject($"Bubble_{i}", typeof(RectTransform), typeof(Image));
+                bubbleGo.transform.SetParent(parent, false);
+                bubbleGo.transform.SetAsFirstSibling();
+                var bubbleRect = bubbleGo.GetComponent<RectTransform>();
+                bubbleRect.anchoredPosition = positions[i];
+                bubbleRect.sizeDelta = new Vector2(size, size);
+                var bubbleImage = bubbleGo.GetComponent<Image>();
+                bubbleImage.sprite = SpriteFactory.CreateSoftBubbleSprite(size, color);
+                bubbleImage.raycastTarget = false;
+            }
+        }
+
+        private static void ApplyTextOutline(Text text, Color outlineColor, Vector2 effectDistance)
+        {
+            var outline = text.gameObject.AddComponent<Outline>();
+            outline.effectColor = outlineColor;
+            outline.effectDistance = effectDistance;
+        }
+
+        private static void ApplyButtonShadow(Image image)
+        {
+            var shadow = image.gameObject.AddComponent<Shadow>();
+            shadow.effectColor = new Color(0.2f, 0.1f, 0.35f, 0.35f);
+            shadow.effectDistance = new Vector2(0f, -4f);
         }
 
         private static void Stretch(RectTransform rect)
